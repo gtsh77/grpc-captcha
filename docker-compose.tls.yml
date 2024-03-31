@@ -1,0 +1,30 @@
+version: '3'
+services:       
+  redis: &rd
+    user: "redis:redis"
+    build:
+      dockerfile: Dockerfile.redis
+      context: .  
+    restart: on-failure:5   
+    ports:
+      - "6379:6379"
+    volumes:
+      - 'vredis:/data:rw'
+    environment:
+      TZ: 'UTC'
+    entrypoint: redis-server --dir /db --save 10 1 --loglevel warning --maxmemory 128mb --requirepass YQ3dvPx3fVzv --tls-port 6379 --port 0 --tls-cert-file /crt/server.crt --tls-key-file /crt/server.key --tls-ca-cert-file /crt/ca.crt --tls-protocols "TLSv1.2 TLSv1.3"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--tls", "--cacert", "/crt/ca.crt", "--cert", "/crt/server.crt", "--key", "/crt/server.key", "-a", "YQ3dvPx3fVzv", "ping" ]
+      start_period: 3s
+      interval: 1s
+      timeout: 1s
+      retries: 3
+    networks:
+      default:
+        aliases:
+          - redis-master-tls.secure.nd        
+networks:
+  default:
+volumes:
+  vpostgres:
+  vredis:

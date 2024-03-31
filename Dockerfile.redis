@@ -1,0 +1,19 @@
+FROM redis:7.2-alpine
+
+WORKDIR /
+RUN mkdir /crt /db
+
+# RUN apt update
+# RUN apt install ca-certificates -y
+
+COPY ./.deploy/crt/ca.crt crt/ca.crt
+COPY ./.deploy/crt/secure.nd.crt crt/server.crt
+COPY ./.deploy/crt/secure.nd.key crt/server.key
+
+# COPY ./.deploy/crt/ca.crt /usr/local/share/ca-certificates/. 
+
+
+# RUN update-ca-certificates
+
+RUN chown -R redis:redis crt db
+RUN chmod -R 500 crt
