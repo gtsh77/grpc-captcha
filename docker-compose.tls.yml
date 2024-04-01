@@ -1,5 +1,5 @@
 version: '3'
-services:       
+services:     
   redis: &rd
     user: "redis:redis"
     build:

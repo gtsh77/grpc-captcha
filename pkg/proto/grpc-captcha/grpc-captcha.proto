@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package werkstatt.captcha;
+option go_package = "gitlab.com/gtsh77-workshop/grpc-captcha/pkg/proto/grpc-captcha";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+service CaptchaService {
+    rpc Generate(google.protobuf.Empty) returns (CaptchaResponse){}
+    rpc Verify(VerifyCaptchaRequest) returns (google.protobuf.Empty){}
+}
+
+message VerifyCaptchaRequest {
+    string id = 1;
+    string code = 2;
+}
+message CaptchaResponse {
+    string id = 1;
+    string data = 2;
+    google.protobuf.Timestamp valid_till = 3;
+}
