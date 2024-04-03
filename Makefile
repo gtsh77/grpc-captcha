@@ -42,11 +42,10 @@ lint:
 	@echo "Running golangci-lint..."
 	$(V)golangci-lint run
 
-HUB := "registry.digitalocean.com/gtsh77-workshop"
+HUB := "gtsh77workshop"
 .PHONY: image
-image: linux
 image:
-	docker image build -t ${HUB}/${APP}:${RELEASE} -t ${HUB}/${APP}:latest -f deploy/$(APP)/Dockerfile .
+	docker image build -t ${HUB}/${APP}:${RELEASE} -t ${HUB}/${APP}:latest -f Dockerfile.service.local .
 
 .PHONY: protobuf
 protobuf: PROTO_SRC:= ./pkg/proto/$(APP)

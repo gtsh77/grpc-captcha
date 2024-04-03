@@ -1,0 +1,21 @@
+FROM gtsh77workshop/golang:1.21 as builder
+WORKDIR /go/src/service
+
+COPY . .
+
+RUN apt-get install git make bash -y
+
+ENV CGO_ENABLED=0
+CMD /bin/bash
+
+RUN make
+
+FROM gtsh77workshop/golang:1.21 as service
+
+WORKDIR /app
+
+COPY --from=builder /go/src/service/bin/grpc-captcha ./grpc-captcha
+
+CMD chmod 755 -R service
+
+ENTRYPOINT ["/app/grpc-captcha"]
