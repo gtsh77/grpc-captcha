@@ -63,8 +63,8 @@ type Config struct {
 		TLS *TLS
 	}
 	Render struct {
-		TTL    time.Duration `conf:"default:30s"`
-		Len    int           `conf:"default:5"`
+		TTL    time.Duration `conf:"default:60s"`
+		DigCnt int           `conf:"default:5"`
 		Width  int           `conf:"default:180"`
 		Height int           `conf:"default:80"`
 	}

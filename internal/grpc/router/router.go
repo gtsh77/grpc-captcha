@@ -6,11 +6,13 @@ import (
 	"fmt"
 
 	"gitlab.com/gtsh77-workshop/grpc-captcha/config"
+	"gitlab.com/gtsh77-workshop/grpc-captcha/internal/grpc/controller"
 	"gitlab.com/gtsh77-workshop/grpc-captcha/internal/grpc/controller/captcha"
 	pb "gitlab.com/gtsh77-workshop/grpc-captcha/pkg/proto/grpc-captcha"
 	"gitlab.com/gtsh77-workshop/grpc-captcha/pkg/tools"
 
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -22,15 +24,18 @@ import (
 type GrpcServer struct {
 	log *zap.SugaredLogger
 	cfg *config.Config
+	rds *redis.Client
 }
 
 func New(
 	logger *zap.SugaredLogger,
 	config *config.Config,
+	rds *redis.Client,
 ) *GrpcServer {
 	return &GrpcServer{
 		log: logger,
 		cfg: config,
+		rds: rds,
 	}
 }
 
@@ -55,9 +60,12 @@ func (s *GrpcServer) RegisterRouter() (*grpc.Server, error) {
 		)
 	}
 
-	pb.RegisterCaptchaServiceServer(router, &captcha.CaptchaService{
-		Log: s.log,
-		Cfg: s.cfg,
+	pb.RegisterCaptchaServiceServer(router, &captcha.Controller{
+		Base: &controller.Base{
+			Log: s.log,
+			Cfg: s.cfg,
+		},
+		Rds: s.rds,
 	})
 
 	if s.cfg.GRPC.EnableProm {
@@ -94,5 +102,5 @@ func (s *GrpcServer) localInterceptor(ctx context.Context, req interface{}, info
 		}
 	}
 
-	return nil, status.Errorf(codes.Unauthenticated, "Unauthenticated")
+	return nil, status.Error(codes.Unauthenticated, "Unauthenticated")
 }

@@ -229,7 +229,7 @@ func (s *Service) StartGrpc() <-chan error {
 
 	grpcCh = make(chan error, 1)
 
-	if s.rpc, err = grouter.New(s.log, s.Cfg).RegisterRouter(); err != nil {
+	if s.rpc, err = grouter.New(s.log, s.Cfg, s.Rds).RegisterRouter(); err != nil {
 		grpcCh <- err
 		return grpcCh
 	}
