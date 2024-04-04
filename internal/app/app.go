@@ -265,6 +265,9 @@ func (s *Service) shutdown(ctx context.Context) error {
 
 	s.isRdy = false
 
+	s.rpc.GracefulStop()
+	s.log.Warn("grpc server shutdown")
+
 	if s.http != nil {
 		if err = s.http.Shutdown(ctx); err != nil {
 			s.log.Errorf("http.Shutdown: %v", err)

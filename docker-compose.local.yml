@@ -1,9 +1,9 @@
 version: '3'
 services:    
   captcha:
-    image: gtsh77workshop/grpc-captcha:v0.9.0
+    image: gtsh77workshop/grpc-captcha:v0.9.1
     # build:
-    #   dockerfile: Dockerfile.service.local
+    #   dockerfile: Dockerfile.service
     #   context: .
     env_file: 
       - .deploy/env/local.env
