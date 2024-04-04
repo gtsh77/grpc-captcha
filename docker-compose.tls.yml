@@ -1,5 +1,40 @@
 version: '3'
 services:     
+  captcha:
+    image: gtsh77workshop/grpc-captcha:v0.9.1
+    # build:
+    #   dockerfile: Dockerfile.service
+    #   context: .
+    env_file: 
+      - .deploy/env/local.env
+    environment:
+      CAPTCHA_REDIS_HOST: redis-master-tls.secure.nd
+      CAPTCHA_HTTP_TLS_ENABLED: true
+      CAPTCHA_HTTP_TLS_DOMAIN_NAME: captcha.secure.nd
+      CAPTCHA_HTTP_TLS_CRT_DATA: $CAPTCHA_HTTP_TLS_CRT_DATA
+      CAPTCHA_HTTP_TLS_KEY_DATA: $CAPTCHA_HTTP_TLS_KEY_DATA
+      CAPTCHA_HTTP_TLS_CRT_CA_DATA: $CAPTCHA_HTTP_TLS_CRT_CA_DATA      
+      CAPTCHA_GRPC_TLS_ENABLED: true
+      CAPTCHA_GRPC_TLS_DOMAIN_NAME: captha.secure.nd
+      CAPTCHA_GRPC_TLS_CRT_DATA: $CAPTCHA_GRPC_TLS_CRT_DATA
+      CAPTCHA_GRPC_TLS_KEY_DATA: $CAPTCHA_GRPC_TLS_KEY_DATA
+      CAPTCHA_GRPC_TLS_CRT_CA_DATA: $CAPTCHA_GRPC_TLS_CRT_CA_DATA
+      CAPTCHA_REDIS_TLS_ENABLED: true
+      CAPTCHA_REDIS_TLS_DOMAIN_NAME: captcha.secure.nd
+      CAPTCHA_REDIS_TLS_CRT_DATA: $CAPTCHA_REDIS_TLS_CRT_DATA 
+      CAPTCHA_REDIS_TLS_KEY_DATA: $CAPTCHA_REDIS_TLS_KEY_DATA
+      CAPTCHA_REDIS_TLS_CRT_CA_DATA: $CAPTCHA_REDIS_TLS_CRT_CA_DATA 
+    ports:
+      - 1111:1111      
+      - 2222:2222      
+    networks:
+      default:  
+        aliases:
+          - captcha.secure.nd           
+    restart: on-failure:5
+    depends_on:
+      redis:
+        condition: service_healthy  
   redis: &rd
     user: "redis:redis"
     build:

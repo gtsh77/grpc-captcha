@@ -45,7 +45,7 @@ lint:
 HUB := "gtsh77workshop"
 .PHONY: image
 image:
-	docker image build -t ${HUB}/${APP}:${RELEASE} -t ${HUB}/${APP}:latest -f Dockerfile.service.local .
+	docker image build -t ${HUB}/${APP}:${RELEASE} -t ${HUB}/${APP}:latest -f Dockerfile.service .
 
 .PHONY: protobuf
 protobuf: PROTO_SRC:= ./pkg/proto/$(APP)
