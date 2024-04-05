@@ -1,4 +1,4 @@
-### GRPC-CAPTCHA [v0.9.1] (4 Apr 2024)
+### GRPC-CAPTCHA [v0.9.2] (5 Apr 2024)
 ### INFO
 
 #### requirements
@@ -12,18 +12,14 @@ based on lite (render, random) version of https://github.com/dchest/captcha
 [![image](https://i.postimg.cc/rshMqnnR/captcha4d.png)](https://i.postimg.cc/rshMqnnR/captcha4d.png)
 >180x80px 4 digits png image
 
-#### design
-##### method CaptchaService.Generate(empty):
-Generate new sequence code of [0-9] digits in quantity of `CAPTCHA_RENDER_DIG_CNT`, render png image `CAPTCHA_RENDER_WIDTH` x `CAPTCHA_RENDER_HEIGHT` px, store code sequence in redis db with TTL `CAPTCHA_RENDER_TTL` and return base64 encoding of image and uniqique captcha `id` to identify the sequence (`uuidv4`)
-
-##### method CaptchaService.Verify(id, code):
-compare code sequences in payload and value stored in redis by provided key (`id`), if no such key ret `NotFound`, if values are not equal ret `FailedPrecondition`, if eq ret `OK` and remove key from redis
-
 #### ENV vars
 [ENV FILE](.deploy/env/local.env)
 
 #### gRPC service schema
 [PROTO](pkg/proto/grpc-captcha/grpc-captcha.proto)
+
+#### Multi platform binaries
+[LIST](bin)
 
 ### SIMPLE USAGE (NON-TLS)
 
@@ -35,6 +31,12 @@ docker run --rm -it -p 1111:1111 -p 2222:2222 --env-file=.deploy/env/local.env -
 #### OR start via docker compose with redis
 ```
 docker compose -f docker-compose.local.yml up
+```
+
+#### OR export env settings and use binaries depends on your platform
+```
+export $(grep -v '^#' ./deploy/env/local.env | xargs)
+./bin/grpc-captcha_linux_amd64
 ```
 
 #### grpc: generate new captcha image (insecure)
@@ -121,6 +123,13 @@ https://onlinepngtools.com/convert-base64-to-png
 
 ### DEV INFO
 
+#### design
+##### method CaptchaService.Generate(empty):
+Generate new sequence code of [0-9] digits in quantity of `CAPTCHA_RENDER_DIG_CNT`, render png image `CAPTCHA_RENDER_WIDTH` x `CAPTCHA_RENDER_HEIGHT` px, store code sequence in redis db with TTL `CAPTCHA_RENDER_TTL` and return base64 encoding of image and uniqique captcha `id` to identify the sequence (`uuidv4`)
+
+##### method CaptchaService.Verify(id, code):
+compare code sequences in payload and value stored in redis by provided key (`id`), if no such key ret `NotFound`, if values are not equal ret `FailedPrecondition`, if eq ret `OK` and remove key from redis
+
 #### compile and run on your host
 
 ```
@@ -161,3 +170,8 @@ curl 0.0.0.0:1111/health/operable
 ```
 curl 0.0.0.0:1111/metrics
 ```
+
+
+define B = 
+go build -ldflags "-s -w -X main.name=$(APP) -X main.version=$(RELEASE) -X main.compiledAt=$(BUILD_TIME)" -o $(APP_OUT) $(APP_MAIN)
+endef

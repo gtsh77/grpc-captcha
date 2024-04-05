@@ -14,8 +14,8 @@ FROM gtsh77workshop/golang:1.21 as service
 
 WORKDIR /app
 
-COPY --from=builder /go/src/service/bin/grpc-captcha ./grpc-captcha
+COPY --from=builder /go/src/service/bin/grpc-captcha_linux_amd64 ./grpc-captcha_linux_amd64
 
 CMD chmod 755 -R service
 
-ENTRYPOINT ["/app/grpc-captcha"]
+ENTRYPOINT ["/app/grpc-captcha_linux_amd64"]
