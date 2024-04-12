@@ -1,4 +1,4 @@
-### GRPC-CAPTCHA [v0.9.2] (5 Apr 2024)
+### GRPC-CAPTCHA [v1.0.0] (12 Apr 2024)
 ### INFO
 
 #### requirements
@@ -25,7 +25,7 @@ based on lite (render, random) version of https://github.com/dchest/captcha
 
 #### start via docker image (specify own redis 7.x instance)
 ```
-docker run --rm -it -p 1111:1111 -p 2222:2222 --env-file=.deploy/env/local.env -e CAPTCHA_REDIS_HOST=0.0.0.0 -e CAPTCHA_REDIS_PORT=6379 -e CAPTCHA_REDIS_DB=0 -e CAPTCHA_REDIS_PASS=YQ3dvPx3fVzv gtsh77workshop/grpc-captcha:v0.9.0
+docker run --rm -it -p 1111:1111 -p 2222:2222 --env-file=.deploy/env/local.env -e CAPTCHA_REDIS_HOST=0.0.0.0 -e CAPTCHA_REDIS_PORT=6379 -e CAPTCHA_REDIS_DB=0 -e CAPTCHA_REDIS_PASS=YQ3dvPx3fVzv gtsh77workshop/grpc-captcha:v1.0.0
 ```
 
 #### OR start via docker compose with redis
@@ -50,7 +50,7 @@ grpcurl -H 'x-api-key: 1ace3bed-3aaf-4642-adb1-d63aef85895f' -plaintext -import-
 
 #### grpc: validate captcha (insecure)
 ```
-grpcurl -H 'x-api-key: 1ace3bed-3aaf-4642-adb1-d63aef85895f' -plaintext -import-path pkg/proto/grpc-captcha -proto grpc-captcha.proto -d '{"id":"acf26399-0aa3-4fea-89ef-495476315998", "code": "5485"}' 0.0.0.0:2222 werkstatt.captcha.CaptchaService.Verify |jq
+grpcurl -H 'x-api-key: 1ace3bed-3aaf-4642-adb1-d63aef85895f' -plaintext -import-path pkg/proto/grpc-captcha -proto grpc-captcha.proto -d '{"id":"acf26399-0aa3-4fea-89ef-495476315998", "otp": "5485"}' 0.0.0.0:2222 werkstatt.captcha.CaptchaService.Verify |jq
 {}
 ```
 

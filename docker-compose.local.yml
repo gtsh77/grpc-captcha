@@ -1,11 +1,12 @@
 version: '3'
 services:    
   captcha:
-    image: gtsh77workshop/grpc-captcha:v0.9.2
+    image: gtsh77workshop/grpc-captcha:v1.0.0
     # build:
     #   dockerfile: Dockerfile.service
     #   context: .
     environment:
+      CAPTCHA_RUNTIME_IS_DEV_MODE: false
       CAPTCHA_LOG_LEVEL: 0
       CAPTCHA_LOG_AS_JSON: true
       CAPTCHA_HTTP_DOMAIN_NAMES: "*"

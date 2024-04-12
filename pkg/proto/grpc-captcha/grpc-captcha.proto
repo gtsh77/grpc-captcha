@@ -13,10 +13,11 @@ service CaptchaService {
 
 message VerifyCaptchaRequest {
     string id = 1;
-    string code = 2;
+    string otp = 2;
 }
 message CaptchaResponse {
     string id = 1;
     string data = 2;
-    google.protobuf.Timestamp valid_till = 3;
+    google.protobuf.Timestamp exprires_at = 3;
+    string dev_otp = 4;
 }

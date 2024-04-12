@@ -20,6 +20,7 @@ type Config struct {
 		Name       string `conf:"-"` // LD флаг
 		Version    string `conf:"-"` // LD флаг
 		CompiledAt string `conf:"-"` // LD флаг
+		IsDevMode  bool   `conf:"default:false"`
 	}
 	Log struct {
 		Level  int  `conf:"default:0"`
@@ -63,7 +64,7 @@ type Config struct {
 		TLS *TLS
 	}
 	Render struct {
-		TTL    time.Duration `conf:"default:60s"`
+		TTL    time.Duration `conf:"default:120s"`
 		DigCnt int           `conf:"default:5"`
 		Width  int           `conf:"default:180"`
 		Height int           `conf:"default:80"`

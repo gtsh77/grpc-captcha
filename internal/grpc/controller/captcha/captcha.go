@@ -3,6 +3,7 @@ package captcha
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/redis/go-redis/v9"
@@ -11,6 +12,7 @@ import (
 	pb "gitlab.com/gtsh77-workshop/grpc-captcha/pkg/proto/grpc-captcha"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/google/uuid"
 	"go.uber.org/zap"
@@ -39,6 +41,7 @@ func New(
 
 func (c *Controller) Generate(ctx context.Context, empt *empty.Empty) (*pb.CaptchaResponse, error) {
 	var (
+		res          *pb.CaptchaResponse
 		id           string
 		seq          []byte
 		data, seqStr string
@@ -65,17 +68,22 @@ func (c *Controller) Generate(ctx context.Context, empt *empty.Empty) (*pb.Captc
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &pb.CaptchaResponse{
-		Id:   id,
-		Data: data,
-	}, nil
+	res = &pb.CaptchaResponse{
+		Id:         id,
+		Data:       data,
+		ExpriresAt: timestamppb.New(time.Now().Add(c.Cfg.Render.TTL)),
+	}
+
+	if c.Cfg.Runtime.IsDevMode {
+		res.DevOtp = seqStr
+	}
+
+	return res, nil
 }
 
 func (c *Controller) Verify(ctx context.Context, req *pb.VerifyCaptchaRequest) (*empty.Empty, error) {
 	var (
-		rcmd *redis.StringCmd
-
-		id, code, rdata string
+		id, otp, rdata string
 
 		err error
 	)
@@ -85,18 +93,12 @@ func (c *Controller) Verify(ctx context.Context, req *pb.VerifyCaptchaRequest) (
 		return nil, status.Error(codes.InvalidArgument, "empty field (id) provided")
 	}
 
-	if code = req.GetCode(); len(code) == 0 {
+	if otp = req.GetOtp(); len(otp) == 0 {
 		c.Log.Named(NamespaceCaptcha).Warn("CaptchaServiceServer.Verify empty field (code) provided")
 		return nil, status.Error(codes.InvalidArgument, "empty field (code) provided")
 	}
 
-	if rcmd = c.Rds.Get(ctx, id); err != nil {
-		c.Log.Named(NamespaceCaptcha).Errorf("redis.Get: %v", err)
-		return nil, status.Error(codes.Internal, err.Error())
-
-	}
-
-	if rdata, err = rcmd.Result(); err != nil {
+	if rdata, err = c.Rds.Get(ctx, id).Result(); err != nil {
 		if errors.Is(err, redis.Nil) {
 			c.Log.Named(NamespaceCaptcha).Debugf("empty key request: %s", id)
 			return nil, status.Error(codes.NotFound, codes.NotFound.String())
@@ -106,7 +108,7 @@ func (c *Controller) Verify(ctx context.Context, req *pb.VerifyCaptchaRequest) (
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	if rdata != code {
+	if rdata != otp {
 		return nil, status.Error(codes.FailedPrecondition, codes.FailedPrecondition.String())
 	}
 

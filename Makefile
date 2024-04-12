@@ -56,7 +56,7 @@ protobuf:
 	@protoc -I$(PROTO_SRC) --go-grpc_out=$(PROTO_DEST) --go-grpc_opt paths=source_relative $(PROTO_SRC)/$(APP).proto
 
 .PHONY: release
-release: clean linux64 linux32 windows64 windows32 freebsd64 freebsd32 darwin64 darwin32
+release: clean linux64 linux32 windows64 windows32 freebsd64 freebsd32 darwin64
 	@echo OK
 
 .PHONY: linux64
@@ -67,31 +67,26 @@ linux64:
 linux32:
 	@echo BUILDING $(OUT_DIR)/$(APP)_linux_386
 	@GOOS=linux GOARCH=386 go build -ldflags "-s -w -X main.name=$(APP) -X main.version=$(RELEASE) -X main.compiledAt=$(BUILD_TIME)" -o $(OUT_DIR)/$(APP)_linux_386 $(APP_MAIN)
-.PHONY: linux32	
+.PHONY: windows64	
 windows64:
 	@echo BUILDING $(OUT_DIR)/$(APP)_windows_amd64
 	@GOOS=windows GOARCH=amd64 go build -ldflags "-s -w -X main.name=$(APP) -X main.version=$(RELEASE) -X main.compiledAt=$(BUILD_TIME)" -o $(OUT_DIR)/$(APP)_windows_amd64 $(APP_MAIN)
-.PHONY: linux32
+.PHONY: windows32
 windows32:
 	@echo BUILDING $(OUT_DIR)/$(APP)_windows_386
 	@GOOS=windows GOARCH=386 go build -ldflags "-s -w -X main.name=$(APP) -X main.version=$(RELEASE) -X main.compiledAt=$(BUILD_TIME)" -o $(OUT_DIR)/$(APP)_windows_386 $(APP_MAIN)
-.PHONY: linux32
+.PHONY: freebsd64
 freebsd64:
 	@echo BUILDING $(OUT_DIR)/$(APP)_freebsd_amd64
 	@GOOS=freebsd GOARCH=amd64 go build -ldflags "-s -w -X main.name=$(APP) -X main.version=$(RELEASE) -X main.compiledAt=$(BUILD_TIME)" -o $(OUT_DIR)/$(APP)_freebsd_amd64 $(APP_MAIN)
-.PHONY: linux32
+.PHONY: freebsd32
 freebsd32:
 	@echo BUILDING $(OUT_DIR)/$(APP)_freebsd_386
 	@GOOS=freebsd GOARCH=386 go build -ldflags "-s -w -X main.name=$(APP) -X main.version=$(RELEASE) -X main.compiledAt=$(BUILD_TIME)" -o $(OUT_DIR)/$(APP)_freebsd_386 $(APP_MAIN)
-.PHONY: linux32
+.PHONY: darwin64
 darwin64:
 	@echo BUILDING $(OUT_DIR)/$(APP)_darwin_amd64
 	@GOOS=darwin GOARCH=amd64 go build -ldflags "-s -w -X main.name=$(APP) -X main.version=$(RELEASE) -X main.compiledAt=$(BUILD_TIME)" -o $(OUT_DIR)/$(APP)_darwin_amd64 $(APP_MAIN)
-.PHONY: linux32
-darwin32:
-	@echo BUILDING $(OUT_DIR)/$(APP)_linux_386
-	@GOOS=linux GOARCH=386 go build -ldflags "-s -w -X main.name=$(APP) -X main.version=$(RELEASE) -X main.compiledAt=$(BUILD_TIME)" -o $(OUT_DIR)/$(APP)_linux_386 $(APP_MAIN)
-
 
 .PHONY: clean
 clean: 
